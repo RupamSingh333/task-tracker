@@ -83,6 +83,60 @@ body {
   color: #f39c12; /* Highlight color */
 }
 
+/* Navbar.css */
+.navbar {
+  font-family: "Roboto", sans-serif;
+  padding: 10px 15px;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.brand-title {
+  color: var(--primary-color, #007bff);
+}
+
+.nav-link {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 10px;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--hover-color, #ff5722);
+}
+
+.mode-toggle {
+  font-size: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.mode-toggle:hover {
+  transform: rotate(20deg);
+}
+
+.navbar-toggler {
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.navbar-toggler:focus {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.fixed-top {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(0, 0, 0, 0.1)
+  );
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 
 
 
