@@ -1,6 +1,6 @@
 # Getting Started with Create React App
 
-Project URL https://rupamsingh333.github.io/Textutils-2025
+Project URL https://rupamsingh333.github.io/task-tracker
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
