@@ -1,16 +1,29 @@
-import React, { useRef } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { FaMoon, FaSun } from "react-icons/fa"; // Import icons
 import { FiHome } from "react-icons/fi"; // Home icon
 
 export default function Navbar(props) {
-  const footerRef = props.footerRef; // Get the footer ref from props
 
-  const handleScrollToFooter = () => {
-    if (footerRef && footerRef.current) {
-      footerRef.current.scrollIntoView({ behavior: "smooth" }); // Smooth scroll to footer
-    }
-  };
+  // State to store the current time
+  const [currentTime, setCurrentTime] = useState("");
+
+  // Function to update time every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const time = now.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+      setCurrentTime(time);
+    }, 1000);
+
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, []);
+
 
   return (
     <nav
@@ -57,8 +70,7 @@ export default function Navbar(props) {
             <li className="nav-item">
               <a
                 className="nav-link"
-                href="#"
-                onClick={handleScrollToFooter} // Scroll to footer on click
+                href="#contact"
               >
                 Contact
               </a>
@@ -75,8 +87,33 @@ export default function Navbar(props) {
           >
             {props.mode === "light" ? <FaMoon /> : <FaSun />}
           </div>
+
+          {/* Watch */}
+          <div
+            className="watch ms-3"
+            style={{
+              fontSize: "1rem",
+              fontWeight: "bold",
+              color: props.mode === "light" ? "#000" : "#fff",
+              textShadow: "0px 1px 5px rgba(0, 0, 0, 0.5)",
+              animation: "pulse 1s infinite",
+            }}
+          >
+            {currentTime}
+          </div>
         </div>
       </div>
+
+      {/* Adding CSS for the watch animation */}
+      <style>
+        {`
+          @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+          }
+        `}
+      </style>
     </nav>
   );
 }

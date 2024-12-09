@@ -56,7 +56,10 @@ function App() {
           <About mode={mode} />
         </section>
       </main>
-      <Footer mode={mode} />
+      <span id="contact">
+      <Footer  mode={mode} />
+
+      </span>
     </>
   );
 }
