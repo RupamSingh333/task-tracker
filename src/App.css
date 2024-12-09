@@ -1,0 +1,96 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+body {
+  padding-top: 80px; /* Adjust depending on the height of your navbar */
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.app.light {
+  background-color: #fff;
+  color: #000;
+}
+
+.app.dark {
+  background-color: #333;
+  color: #fff;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.footer {
+  background-color: #333;
+  color: white;
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+.footer a {
+  /* color: white; */
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.footer h5 {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.footer .list-unstyled {
+  padding-left: 0;
+}
+
+.footer .d-flex {
+  list-style: none;
+}
+
+.footer .d-flex li {
+  margin-right: 20px;
+}
+
+.footer .d-flex li a {
+  color: white;
+}
+
+.footer .d-flex li a:hover {
+  color: #f39c12; /* Highlight color */
+}
+
+
+
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
