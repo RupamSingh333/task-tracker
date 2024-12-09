@@ -1,5 +1,6 @@
 {
-  "name": "tasktracker",
+  "homepage": "https://rupamsingh333.github.io/task-tracker",
+  "name": "reactpractice",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
