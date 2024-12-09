@@ -201,33 +201,43 @@ export default function TaskTimer({ mode }) {
                 className={`card ${
                   task.status === "completed"
                     ? "bg-success text-white"
-                    : "bg-warning"
-                }`}
+                    : "bg-warning text-dark"
+                } shadow-lg`}
                 style={{
-                  backgroundColor: mode === "dark" ? "#444" : "#fff",
-                  color: mode === "dark" ? "white" : "black",
-                  borderRadius: "8px",
+                  borderRadius: "10px",
                   padding: "15px",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 }}
               >
                 <div className="card-body">
-                  <strong>{task.name}</strong>
-                  <div className="d-flex justify-content-between align-items-center mb-2">
-                    <p className="text-dark mb-0" style={{ fontSize: "14px" }}>
-                      <strong>Created:</strong> {task.createdAt}
-                    </p>
-                    <p className="text-dark mb-0" style={{ fontSize: "14px" }}>
-                      <strong>Time Spent:</strong>{" "}
-                      {Math.floor(timeSpent[task.taskId] / 60)}m{" "}
-                      {timeSpent[task.taskId] % 60}s
-                    </p>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <strong style={{ fontSize: "18px" }}>{task.name}</strong>
+                    {task.status === "completed" && (
+                      <span className="badge bg-dark">Completed</span>
+                    )}
+                  </div>
+                  <div className="mt-2 mb-3">
+                    {/* Using d-flex to place Created and Time Spent on the same line */}
+                    <div className="d-flex justify-content-between align-items-center">
+                      <p className="mb-1" style={{ fontSize: "14px", flex: 1 }}>
+                        <strong>Created:</strong> {task.createdAt}
+                      </p>
+                      <p className="mb-1" style={{ fontSize: "14px", flex: 1 }}>
+                        <strong>Time Spent:</strong>{" "}
+                        {timeSpent[task.taskId] &&
+                        !isNaN(timeSpent[task.taskId])
+                          ? `${Math.floor(timeSpent[task.taskId] / 60)}m ${
+                              timeSpent[task.taskId] % 60
+                            }s`
+                          : "0m 0s"}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Task Controls - Aligned in a single row */}
                   <div className="d-flex justify-content-between align-items-center">
-                    <div className="d-flex">
+                    <div className="d-flex flex-wrap">
                       <button
-                        className="btn btn-danger btn-sm mx-1"
+                        className="btn btn-danger btn-sm me-2"
                         onClick={() => handleDeleteTask(task.taskId)}
                       >
                         Delete
@@ -235,25 +245,25 @@ export default function TaskTimer({ mode }) {
                       {task.status === "pending" && (
                         <>
                           <button
-                            className="btn btn-success btn-sm mx-1"
+                            className="btn btn-success btn-sm me-2"
                             onClick={() => startTimer(task)}
                           >
                             Start
                           </button>
                           <button
-                            className="btn btn-warning btn-sm mx-1"
+                            className="btn btn-warning btn-sm me-2"
                             onClick={() => pauseTimer(task)}
                           >
                             Pause
                           </button>
                           <button
-                            className="btn btn-danger btn-sm mx-1"
+                            className="btn btn-danger btn-sm me-2"
                             onClick={() => resetTimer(task)}
                           >
                             Reset
                           </button>
                           <button
-                            className="btn btn-info btn-sm mx-1"
+                            className="btn btn-info btn-sm me-2"
                             onClick={() => handleCompleteTask(task.taskId)}
                           >
                             Mark as Completed
@@ -262,28 +272,24 @@ export default function TaskTimer({ mode }) {
                       )}
                     </div>
                     {task.status === "completed" && (
-                      <div>
-                        {/* Collapse for completed task details */}
-                        <button
-                          className="btn btn-light btn-sm"
-                          data-bs-toggle="collapse"
-                          data-bs-target={`#completedDesc-${task.taskId}`}
-                          aria-expanded="false"
-                          aria-controls={`completedDesc-${task.taskId}`}
-                        >
-                          Show Details
-                        </button>
-                      </div>
+                      <button
+                        className="btn btn-light btn-sm"
+                        data-bs-toggle="collapse"
+                        data-bs-target={`#completedDesc-${task.taskId}`}
+                        aria-expanded="false"
+                        aria-controls={`completedDesc-${task.taskId}`}
+                      >
+                        Show Details
+                      </button>
                     )}
                   </div>
 
-                  {/* Completed task description - collapsed by default */}
                   {task.status === "completed" && (
                     <div
                       id={`completedDesc-${task.taskId}`}
                       className="collapse mt-2"
                     >
-                      <h5>Task Completed</h5>
+                      <h6>Task Completed</h6>
                       <p>{task.description}</p>
                     </div>
                   )}
