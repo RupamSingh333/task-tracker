@@ -1,131 +1,129 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { FaMoon, FaSun } from "react-icons/fa"; // Import icons
-import { FiHome } from "react-icons/fi"; // Home icon
+import { FaMoon, FaSun } from "react-icons/fa";
+import { FiCheckSquare } from "react-icons/fi";
 
 export default function Navbar(props) {
-
-  // State to store the current time
   const [currentTime, setCurrentTime] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
 
-  // Function to update time every second
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
-      const time = now.toLocaleTimeString("en-US", {
+      setCurrentTime(now.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
         hour12: true,
-      });
-      setCurrentTime(time);
+      }));
     }, 1000);
-
-    return () => clearInterval(interval); // Cleanup on component unmount
+    return () => clearInterval(interval);
   }, []);
 
+  const isDark = props.mode === "dark";
 
   return (
-    <nav
-      className={`navbar navbar-expand-lg navbar-${props.mode} bg-${props.mode} shadow-sm fixed-top`}
-    >
-      <div className="container-fluid">
-        {/* Logo and Title */}
-        <a className="navbar-brand d-flex align-items-center" href="#">
-          <span className="brand-title">{props.title}</span>
-        </a>
+    <div style={{
+      position: "sticky",
+      top: isScrolled ? "1rem" : "1.5rem",
+      zIndex: 1000,
+      display: "flex",
+      justifyContent: "center",
+      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+      padding: "0 1rem"
+    }}>
+      <nav
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "2rem",
+          background: isDark ? "rgba(15, 23, 42, 0.65)" : "rgba(255, 255, 255, 0.65)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+          border: isDark ? "1px solid rgba(255, 255, 255, 0.08)" : "1px solid rgba(0, 0, 0, 0.05)",
+          borderRadius: "50px",
+          padding: "0.6rem 1.5rem",
+          boxShadow: isScrolled 
+            ? "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)" 
+            : "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          width: "auto",
+          maxWidth: "100%"
+        }}
+      >
+        {/* Brand/Logo */}
+        <div style={{
+          color: isDark ? "#fff" : "#111",
+          fontWeight: "700",
+          fontSize: "1.2rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem"
+        }}>
+          <FiCheckSquare size={20} style={{ color: isDark ? "#fff" : "#111" }}/>
+          {props.title}
+        </div>
 
-        {/* Toggler button for mobile */}
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        {/* Navbar links and toggler */}
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <a
-                className="nav-link d-flex align-items-center"
-                href="#"
-                aria-current="page"
-              >
-                <FiHome className="me-1" />
-                Home
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#about">
-                About
-              </a>
-            </li>
-
-            <li className="nav-item">
-              <a
-                className="nav-link"
-                href="#contact"
-              >
-                Contact
-              </a>
-            </li>
-          </ul>
-
-          {/* Dark/Light Mode Toggle */}
-          <div
-            className={`mode-toggle text-${
-              props.mode === "light" ? "dark" : "light"
-            }`}
-            onClick={props.togglemode}
-            style={{ cursor: "pointer" }}
-          >
-            {props.mode === "light" ? <FaMoon /> : <FaSun />}
-          </div>
-
+        {/* Right side controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           {/* Watch */}
           <div
-            className="watch ms-3"
             style={{
-              fontSize: "1rem",
-              fontWeight: "bold",
-              color: props.mode === "light" ? "#000" : "#fff",
-              textShadow: "0px 1px 5px rgba(0, 0, 0, 0.5)",
-              animation: "pulse 1s infinite",
+              fontSize: "0.85rem",
+              fontWeight: "600",
+              color: isDark ? "#cbd5e1" : "#475569",
+              fontFamily: "monospace",
+              display: "flex",
+              alignItems: "center"
             }}
           >
-            {currentTime}
+            {currentTime || "Loading..."}
+          </div>
+          
+          {/* Divider */}
+          <div style={{
+            width: "1px",
+            height: "20px",
+            background: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"
+          }}></div>
+
+          {/* Theme Toggle */}
+          <div
+            onClick={props.togglemode}
+            style={{ 
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: isDark ? "#f8fafc" : "#0f172a",
+              transition: "transform 0.2s ease"
+            }}
+            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.15)"}
+            onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+          >
+            {isDark ? <FaSun size={18} /> : <FaMoon size={18} />}
           </div>
         </div>
-      </div>
-
-      {/* Adding CSS for the watch animation */}
-      <style>
-        {`
-          @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-          }
-        `}
-      </style>
-    </nav>
+      </nav>
+    </div>
   );
 }
 
 Navbar.propTypes = {
   title: PropTypes.string.isRequired,
-  aboutText: PropTypes.string.isRequired,
   mode: PropTypes.string.isRequired,
   togglemode: PropTypes.func.isRequired,
 };
 
 Navbar.defaultProps = {
-  title: "Modern Website",
-  aboutText: "About Us",
+  title: "Task Tracker",
 };

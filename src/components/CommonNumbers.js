@@ -1,41 +1,44 @@
 import React, { useState } from "react";
-import toast from "react-hot-toast"; // Import react-hot-toast
+import toast from "react-hot-toast";
+import { FiHash, FiSearch, FiTrash2 } from "react-icons/fi";
 
 export default function CommonNumbers({ mode }) {
   const [firstList, setFirstList] = useState('');
   const [secondList, setSecondList] = useState('');
   const [commonNumbers, setCommonNumbers] = useState([]);
+  const [hasSearched, setHasSearched] = useState(false);
+  const isDark = mode === "dark";
 
   const handleFindCommon = () => {
     try {
-      // Convert input strings to arrays and remove quotes
+      if (!firstList.trim() && !secondList.trim()) {
+        toast.error("Please enter numbers in both lists.");
+        return;
+      }
+
       const parseList = (list) =>
-        list.split(",").map((num) => num.trim().replace(/^['"]|['"]$/g, "")); // Remove single/double quotes
+        list.split(",").map((num) => num.trim().replace(/^['"]|['"]$/g, "")).filter(n => n !== "");
 
       const list1 = parseList(firstList);
       const list2 = parseList(secondList);
 
-      // Check if both lists are empty or invalid
       if (list1.length === 0 || list2.length === 0) {
-        toast.error("Please enter valid lists of numbers separated by commas."); // Show error toast
-        return; // Prevent further execution
+        toast.error("Lists must contain valid comma-separated values.");
+        return;
       }
 
-      // Find common elements
       const common = list1.filter((num) => list2.includes(num));
-      setCommonNumbers(common);
+      const uniqueCommon = [...new Set(common)]; // Remove duplicates from the result
+      setCommonNumbers(uniqueCommon);
+      setHasSearched(true);
 
-      // Show success message if common numbers are found
-      if (common.length > 0) {
+      if (uniqueCommon.length > 0) {
         toast.success("Common numbers found!");
       } else {
         toast.info("No common numbers found.");
       }
     } catch (error) {
-      toast.error(
-        "An error occurred. Please check the format of your input." +
-          error.message
-      );
+      toast.error("An error occurred formatting your lists.");
     }
   };
 
@@ -43,67 +46,103 @@ export default function CommonNumbers({ mode }) {
     setFirstList('');
     setSecondList('');
     setCommonNumbers([]);
+    setHasSearched(false);
     toast.success("Fields cleared.");
   };
 
-  const textStyle = {
-    color: mode === "dark" ? "white" : "black",
-  };
-
-  const inputStyle = {
-    backgroundColor: mode === "dark" ? "#333" : "#fff",
-    color: mode === "dark" ? "white" : "black",
-    border: `1px solid ${mode === "dark" ? "white" : "#ccc"}`,
-  };
-
   return (
-    <div className="container my-4" style={textStyle}>
-      <h2>Find Common Numbers in Two Lists</h2>
-      <div className="mb-3">
-        <label htmlFor="firstList" className="form-label">
-          First List (Comma-separated numbers)
-        </label>
-        <input
-          type="text"
-          className="form-control"
-          id="firstList"
-          style={inputStyle}
-          value={firstList}
-          onChange={(e) => setFirstList(e.target.value)}
-          placeholder={`e.g., 123, '34', "34", 6656`}
-        />
+    <div className="premium-card">
+      <div className="d-flex align-items-center gap-2 mb-4">
+        <FiHash size={28} style={{ color: "var(--accent-light)" }} />
+        <h2 className="mb-0" style={{
+          color: isDark ? "#fff" : "#111",
+          fontWeight: "700"
+        }}>
+          Find Common Elements
+        </h2>
       </div>
-      <div className="mb-3">
-        <label htmlFor="secondList" className="form-label">
-          Second List (Comma-separated numbers)
-        </label>
-        <input
-          type="text"
-          className="form-control"
-          id="secondList"
-          style={inputStyle}
-          value={secondList}
-          onChange={(e) => setSecondList(e.target.value)}
-          placeholder={`e.g., "123", 545, '34', 978`}
-        />
-      </div>
-      <div>
-        <button className="btn btn-primary mx-2" onClick={handleFindCommon}>
-          Find Common Numbers
-        </button>
-        <button className="btn btn-secondary mx-2" onClick={handleClear}>
-          Clear
-        </button>
-      </div>
-      {commonNumbers.length > 0 && (
-        <div className="mt-4">
-          <h4>Common Numbers</h4>
-          <p>{commonNumbers.join(", ")}</p>
+      
+      <p style={{ color: mode === "dark" ? "#94a3b8" : "#64748b", marginBottom: "1.5rem" }}>
+        Enter two comma-separated lists to find overlapping items instantly.
+      </p>
+
+      <div className="row g-4 mb-4">
+        <div className="col-md-6">
+          <label className="form-label fw-bold" style={{ color: mode === "dark" ? "#f8fafc" : "#0f172a" }}>
+            First List
+          </label>
+          <input
+            type="text"
+            className="modern-input"
+            value={firstList}
+            onChange={(e) => setFirstList(e.target.value)}
+            placeholder="e.g. 1, 2, 3, apple, orange"
+          />
         </div>
-      )}
-      {commonNumbers.length === 0 && firstList && secondList && (
-        <div className="mt-4">
-          <h4>No Common Numbers Found</h4>
+        <div className="col-md-6">
+          <label className="form-label fw-bold" style={{ color: mode === "dark" ? "#f8fafc" : "#0f172a" }}>
+            Second List
+          </label>
+          <input
+            type="text"
+            className="modern-input"
+            value={secondList}
+            onChange={(e) => setSecondList(e.target.value)}
+            placeholder="e.g. 3, 4, apple, banana"
+          />
+        </div>
+      </div>
+
+      <div className="d-flex flex-wrap gap-2 mb-4">
+        <button className="modern-btn modern-btn-primary" onClick={handleFindCommon}>
+          <FiSearch /> Compare Lists
+        </button>
+        <button className="modern-btn modern-btn-secondary" onClick={handleClear}>
+          <FiTrash2 /> Clear All
+        </button>
+      </div>
+
+      {hasSearched && (
+        <div 
+          className="p-4 rounded mt-4" 
+          style={{ 
+            background: commonNumbers.length > 0 
+              ? (mode === "dark" ? "rgba(16, 185, 129, 0.1)" : "rgba(16, 185, 129, 0.05)")
+              : (mode === "dark" ? "rgba(239, 68, 68, 0.1)" : "rgba(239, 68, 68, 0.05)"),
+            border: `1px solid ${
+              commonNumbers.length > 0
+                ? (mode === "dark" ? "rgba(16, 185, 129, 0.3)" : "rgba(16, 185, 129, 0.2)")
+                : (mode === "dark" ? "rgba(239, 68, 68, 0.3)" : "rgba(239, 68, 68, 0.2)")
+            }`
+          }}
+        >
+          <h5 className="fw-bold mb-2" style={{ 
+            color: commonNumbers.length > 0 
+              ? (mode === "dark" ? "#34d399" : "#059669")
+              : (mode === "dark" ? "#f87171" : "#dc2626") 
+          }}>
+            {commonNumbers.length > 0 ? `Found ${commonNumbers.length} Common Elements:` : "No matches found."}
+          </h5>
+          
+          {commonNumbers.length > 0 && (
+            <div className="d-flex flex-wrap gap-2 mt-3">
+              {commonNumbers.map((num, idx) => (
+                <span 
+                  key={idx} 
+                  className="px-3 py-1 rounded-pill"
+                  style={{
+                    background: mode === "dark" ? "rgba(255,255,255,0.1)" : "#fff",
+                    color: mode === "dark" ? "#f8fafc" : "#0f172a",
+                    border: mode === "dark" ? "1px solid rgba(255,255,255,0.2)" : "1px solid #e2e8f0",
+                    fontWeight: "500",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                  }}
+                >
+                  {num}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

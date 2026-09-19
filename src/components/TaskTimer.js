@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import toast from "react-hot-toast"; // Import react-hot-toast
+import toast from "react-hot-toast";
+import { FiPlay, FiPause, FiRotateCcw, FiCheck, FiTrash2, FiClock, FiCalendar, FiAlignLeft, FiCheckSquare } from "react-icons/fi";
 
 export default function TaskTimer({ mode }) {
   const [tasks, setTasks] = useState([]);
   const [currentTask, setCurrentTask] = useState("");
   const [timeSpent, setTimeSpent] = useState({});
   const [timers, setTimers] = useState({});
+  const isDark = mode === "dark";
 
-  // Load tasks from localStorage when the component mounts
   useEffect(() => {
     const savedTasks = JSON.parse(localStorage.getItem("tasks"));
     if (savedTasks) {
@@ -20,12 +21,10 @@ export default function TaskTimer({ mode }) {
     }
   }, []);
 
-  // Save tasks to localStorage whenever tasks state changes
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
 
-  // Function to start timer for a task
   const startTimer = (task) => {
     if (task.status === "completed") return;
 
@@ -40,7 +39,6 @@ export default function TaskTimer({ mode }) {
     setTimers((prev) => ({ ...prev, [task.taskId]: newTimer }));
   };
 
-  // Function to pause the timer
   const pauseTimer = (task) => {
     if (timers[task.taskId]) {
       clearInterval(timers[task.taskId]);
@@ -52,71 +50,58 @@ export default function TaskTimer({ mode }) {
     }
   };
 
-  // Function to reset the timer with confirmation
   const resetTimer = (task) => {
-    const confirmReset = window.confirm(
-      "Are you sure you want to reset the timer?"
-    );
+    const confirmReset = window.confirm("Are you sure you want to reset the timer?");
     if (!confirmReset) return;
 
-    setTimeSpent((prev) => ({
-      ...prev,
-      [task.taskId]: 0,
-    }));
-    toast.success("Timer has been reset!"); // Success toast for reset
+    setTimeSpent((prev) => ({ ...prev, [task.taskId]: 0 }));
+    toast.success("Timer has been reset!");
   };
 
-  // Add new task with unique taskId
   const handleAddTask = () => {
     if (!currentTask.trim()) {
-      toast.error("Enter a valid task name."); // Error toast for invalid task name
+      toast.error("Enter a valid task name.");
       return;
     }
 
     const newTask = {
-      taskId: Date.now(), // Use timestamp as a unique ID
+      taskId: Date.now(),
       name: currentTask,
-      createdAt: new Date().toLocaleString(),
+      createdAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }),
       timeSpent: 0,
       status: "pending",
       description: "",
     };
 
     setTasks([newTask, ...tasks]);
-    setCurrentTask(""); // Clear the input field after adding the task
-    toast.success("Task added successfully!"); // Success toast for adding task
+    setCurrentTask("");
+    toast.success("Task added successfully!");
   };
 
-  // Mark task as completed
   const handleCompleteTask = (taskId) => {
     const taskIndex = tasks.findIndex((task) => task.taskId === taskId);
     if (taskIndex === -1) return;
 
     pauseTimer(tasks[taskIndex]);
 
-    const description = prompt(
-      "Please enter a description for the completed task:"
-    );
+    const description = prompt("Please enter a short description for the completed task:");
     if (description !== null && description.trim()) {
       const updatedTasks = [...tasks];
       updatedTasks[taskIndex] = {
         ...updatedTasks[taskIndex],
         status: "completed",
         description: description.trim(),
-        timeSpent: timeSpent[taskId], // Assign total time spent
+        timeSpent: timeSpent[taskId],
       };
       setTasks(updatedTasks);
-      toast.success("Task completed successfully!"); // Success toast for completion
+      toast.success("Task completed successfully!");
     } else {
-      toast.error("Task description is required when marking as completed."); // Error toast for missing description
+      toast.error("Task description is required.");
     }
   };
 
-  // Delete task with confirmation
   const handleDeleteTask = (taskId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this task?"
-    );
+    const confirmDelete = window.confirm("Are you sure you want to delete this task?");
     if (!confirmDelete) return;
 
     const updatedTasks = tasks.filter((task) => task.taskId !== taskId);
@@ -130,174 +115,137 @@ export default function TaskTimer({ mode }) {
         return updatedTimers;
       });
     }
-    toast.success("Task deleted successfully!"); // Success toast for deletion
+    toast.success("Task deleted successfully!");
   };
 
-  // Calculate task statistics
+  const formatTime = (seconds) => {
+    if (!seconds || isNaN(seconds)) return "00:00";
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   const totalTasks = tasks.length;
-  const totalPending = tasks.filter((task) => task.status === "pending").length;
-  const totalCompleted = tasks.filter(
-    (task) => task.status === "completed"
-  ).length;
-  const productivity = totalTasks
-    ? ((totalCompleted / totalTasks) * 100).toFixed(2)
-    : 0;
+  const totalPending = tasks.filter((t) => t.status === "pending").length;
+  const totalCompleted = tasks.filter((t) => t.status === "completed").length;
+  const productivity = totalTasks ? Math.round((totalCompleted / totalTasks) * 100) : 0;
 
   return (
-    <div
-      className="container my-4"
-      style={{
-        color: mode === "dark" ? "white" : "black",
-        backgroundColor: mode === "dark" ? "#333" : "#fff",
-        padding: "20px",
-        borderRadius: "8px",
-      }}
-    >
-      <h2 className="text-center mb-4">Task Timer and Tracker</h2>
+    <div className="premium-card">
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <h2 className="mb-0" style={{
+          color: isDark ? "#fff" : "#111",
+          fontWeight: "700"
+        }}>
+          Task Timer
+        </h2>
+        
+        <div className="d-flex gap-3 text-center" style={{ fontSize: "0.85rem", fontWeight: "600" }}>
+          <div><div style={{ color: "var(--accent-light)", fontSize: "1.25rem" }}>{totalTasks}</div>Total</div>
+          <div><div style={{ color: "#f59e0b", fontSize: "1.25rem" }}>{totalPending}</div>Pending</div>
+          <div><div style={{ color: "#10b981", fontSize: "1.25rem" }}>{totalCompleted}</div>Done</div>
+          <div><div style={{ color: "#8b5cf6", fontSize: "1.25rem" }}>{productivity}%</div>Prod</div>
+        </div>
+      </div>
 
-      <div className="mb-3">
-        <label htmlFor="taskInput" className="form-label">
-          Add a Task
-        </label>
+      <div className="d-flex gap-2 mb-4">
         <input
           type="text"
-          className="form-control"
-          id="taskInput"
+          className="modern-input flex-grow-1"
           value={currentTask}
           onChange={(e) => setCurrentTask(e.target.value)}
-          placeholder="Enter task name"
+          placeholder="What are you working on?"
+          onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
         />
-        <button className="btn btn-primary mt-2" onClick={handleAddTask}>
+        <button className="modern-btn modern-btn-primary" onClick={handleAddTask}>
           Add Task
         </button>
       </div>
 
-      {/* Task Stats */}
-      <div className="mb-3 d-flex justify-content-between align-items-center">
-        <div>
-          <strong>Total Tasks: </strong>
-          {totalTasks}
-        </div>
-        <div>
-          <strong>Total Pending: </strong>
-          {totalPending}
-        </div>
-        <div>
-          <strong>Total Completed: </strong>
-          {totalCompleted}
-        </div>
-        <div>
-          <strong>Productivity: </strong>
-          {productivity}%
-        </div>
-      </div>
-
-      <div>
-        <h4>All Tasks</h4>
-        <div className="row">
-          {tasks.map((task, index) => (
-            <div key={task.taskId} className="col-md-6 mb-3">
-              <div
-                className={`card ${
-                  task.status === "completed"
-                    ? "bg-success text-white"
-                    : "bg-warning text-dark"
-                } shadow-lg`}
-                style={{
-                  borderRadius: "10px",
-                  padding: "15px",
-                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+      <div className="row g-4 mt-2">
+        {tasks.map((task) => {
+          const isCompleted = task.status === "completed";
+          const isRunning = timers[task.taskId];
+          
+          return (
+            <div key={task.taskId} className="col-12 col-md-6 col-lg-4">
+              <div 
+                className="premium-card h-100 d-flex flex-column p-3" 
+                style={{ 
+                  background: isCompleted ? (mode === "dark" ? "rgba(16, 185, 129, 0.1)" : "rgba(16, 185, 129, 0.05)") : undefined,
+                  border: isCompleted ? "1px solid rgba(16, 185, 129, 0.3)" : undefined
                 }}
               >
-                <div className="card-body">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <strong style={{ fontSize: "18px" }}>{task.name}</strong>
-                    {task.status === "completed" && (
-                      <span className="badge bg-dark">Completed</span>
-                    )}
+                <div className="d-flex justify-content-between align-items-start mb-2">
+                  <h5 className="fw-bold mb-0 text-break" style={{ flex: 1, paddingRight: '10px' }}>{task.name}</h5>
+                  {isCompleted && <span className="badge bg-success">Done</span>}
+                </div>
+                
+                <div className="d-flex flex-column gap-2 mb-3" style={{ fontSize: "0.85rem", color: mode === "dark" ? "#94a3b8" : "#64748b" }}>
+                  <div className="d-flex align-items-center gap-2">
+                    <FiCalendar /> {task.createdAt}
                   </div>
-                  <div className="mt-2 mb-3">
-                    {/* Using d-flex to place Created and Time Spent on the same line */}
-                    <div className="d-flex justify-content-between align-items-center">
-                      <p className="mb-1" style={{ fontSize: "14px", flex: 1 }}>
-                        <strong>Created:</strong> {task.createdAt}
-                      </p>
-                      <p className="mb-1" style={{ fontSize: "14px", flex: 1 }}>
-                        <strong>Time Spent:</strong>{" "}
-                        {timeSpent[task.taskId] &&
-                        !isNaN(timeSpent[task.taskId])
-                          ? `${Math.floor(timeSpent[task.taskId] / 60)}m ${
-                              timeSpent[task.taskId] % 60
-                            }s`
-                          : "0m 0s"}
-                      </p>
-                    </div>
+                  <div className="d-flex align-items-center gap-2">
+                    <FiClock /> 
+                    <span style={{ 
+                      fontSize: "1.25rem", 
+                      fontWeight: "700", 
+                      color: isRunning ? "var(--accent-light)" : (mode === "dark" ? "#f8fafc" : "#0f172a"),
+                      fontFamily: "monospace"
+                    }}>
+                      {formatTime(timeSpent[task.taskId])}
+                    </span>
                   </div>
+                </div>
 
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="d-flex flex-wrap">
-                      <button
-                        className="btn btn-danger btn-sm me-2"
-                        onClick={() => handleDeleteTask(task.taskId)}
-                      >
-                        Delete
-                      </button>
-                      {task.status === "pending" && (
-                        <>
-                          <button
-                            className="btn btn-success btn-sm me-2"
-                            onClick={() => startTimer(task)}
-                          >
-                            Start
-                          </button>
-                          <button
-                            className="btn btn-warning btn-sm me-2"
-                            onClick={() => pauseTimer(task)}
-                          >
-                            Pause
-                          </button>
-                          <button
-                            className="btn btn-danger btn-sm me-2"
-                            onClick={() => resetTimer(task)}
-                          >
-                            Reset
-                          </button>
-                          <button
-                            className="btn btn-info btn-sm me-2"
-                            onClick={() => handleCompleteTask(task.taskId)}
-                          >
-                            Mark as Completed
-                          </button>
-                        </>
+                <div className="mt-auto d-flex flex-wrap gap-2">
+                  {!isCompleted && (
+                    <>
+                      {isRunning ? (
+                        <button className="modern-btn modern-btn-warning btn-sm py-1 px-2" onClick={() => pauseTimer(task)}>
+                          <FiPause /> Pause
+                        </button>
+                      ) : (
+                        <button className="modern-btn modern-btn-success btn-sm py-1 px-2" onClick={() => startTimer(task)}>
+                          <FiPlay /> Start
+                        </button>
                       )}
-                    </div>
-                    {task.status === "completed" && (
-                      <button
-                        className="btn btn-light btn-sm"
-                        data-bs-toggle="collapse"
-                        data-bs-target={`#completedDesc-${task.taskId}`}
-                        aria-expanded="false"
-                        aria-controls={`completedDesc-${task.taskId}`}
-                      >
-                        Show Details
+                      <button className="modern-btn modern-btn-secondary btn-sm py-1 px-2" onClick={() => resetTimer(task)}>
+                        <FiRotateCcw />
                       </button>
-                    )}
-                  </div>
-
-                  {task.status === "completed" && (
-                    <div
-                      id={`completedDesc-${task.taskId}`}
-                      className="collapse mt-2"
-                    >
-                      <h6>Task Completed</h6>
-                      <p>{task.description}</p>
+                      <button className="modern-btn modern-btn-primary btn-sm py-1 px-2 flex-grow-1" onClick={() => handleCompleteTask(task.taskId)}>
+                        <FiCheck /> Complete
+                      </button>
+                    </>
+                  )}
+                  
+                  {isCompleted && task.description && (
+                    <div className="w-100 p-2 rounded" style={{ 
+                      background: mode === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
+                      fontSize: "0.85rem" 
+                    }}>
+                      <div className="d-flex align-items-center gap-1 mb-1 fw-bold text-success">
+                        <FiAlignLeft /> Note
+                      </div>
+                      {task.description}
                     </div>
                   )}
+
+                  <button className="modern-btn modern-btn-danger btn-sm py-1 px-2 ms-auto mt-2" onClick={() => handleDeleteTask(task.taskId)}>
+                    <FiTrash2 />
+                  </button>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          );
+        })}
+        {tasks.length === 0 && (
+          <div className="col-12 text-center py-5" style={{ color: mode === "dark" ? "#64748b" : "#94a3b8" }}>
+            <FiCheckSquare size={48} className="mb-3 opacity-50" />
+            <h5>No tasks yet</h5>
+            <p>Add a task above to start tracking your time.</p>
+          </div>
+        )}
       </div>
     </div>
   );
