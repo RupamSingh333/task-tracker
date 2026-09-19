@@ -8,8 +8,9 @@ import CommonNumbers from "./components/CommonNumbers";
 import TaskTimer from "./components/TaskTimer";
 import DevCommands from "./components/DevCommands";
 import TicTacToe from "./components/TicTacToe";
-import RockPaperScissors from "./components/RockPaperScissors";
 import MemoryGame from "./components/MemoryGame";
+import SnakeGame from "./components/SnakeGame";
+import QuizGame from "./components/QuizGame";
 import { Loader } from "lucide-react";
 
 function App() {
@@ -71,15 +72,18 @@ function App() {
                 <h2 style={{ color: mode === "dark" ? "#fff" : "#111", fontWeight: "700" }}>🎮 Gaming Zone</h2>
                 <p style={{ color: mode === "dark" ? "#94a3b8" : "#64748b" }}>Take a break and play against the Computer!</p>
               </div>
-              <div className="row g-4">
-                <div className="col-lg-4 col-md-6">
+              <div className="row g-2 justify-content-center">
+                <div className="col-xl-6 col-lg-6 col-md-6">
                   <TicTacToe mode={mode} />
                 </div>
-                <div className="col-lg-4 col-md-6">
-                  <RockPaperScissors mode={mode} />
-                </div>
-                <div className="col-lg-4 col-md-12">
+                <div className="col-xl-6 col-lg-6 col-md-6">
                   <MemoryGame mode={mode} />
+                </div>
+                <div className="col-xl-6 col-lg-6 col-md-6">
+                  <SnakeGame mode={mode} />
+                </div>
+                <div className="col-xl-6 col-lg-6 col-md-6">
+                  <QuizGame mode={mode} />
                 </div>
               </div>
             </section>

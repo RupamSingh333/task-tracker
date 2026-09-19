@@ -111,7 +111,7 @@ export default function TicTacToe({ mode }) {
   };
 
   return (
-    <div className="premium-card text-center" style={{ maxWidth: "400px", margin: "0 auto" }}>
+    <div className="premium-card text-center">
       <div className="d-flex align-items-center justify-content-center gap-2 mb-4">
         <FiPlay size={28} style={{ color: isDark ? "#fff" : "#111" }} />
         <h2 className="mb-0" style={{ color: isDark ? "#fff" : "#111", fontWeight: "700" }}>

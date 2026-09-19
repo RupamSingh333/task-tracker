@@ -48,7 +48,7 @@ export default function MemoryGame({ mode }) {
   const isWin = matchedIndices.length === EMOJIS.length * 2;
 
   return (
-    <div className="premium-card text-center h-100 d-flex flex-column" style={{ maxWidth: "400px", margin: "0 auto" }}>
+    <div className="premium-card text-center h-100 d-flex flex-column" >
       <div className="d-flex align-items-center justify-content-center gap-2 mb-4">
         <FiPlayCircle size={28} style={{ color: isDark ? "#fff" : "#111" }} />
         <h2 className="mb-0" style={{ color: isDark ? "#fff" : "#111", fontWeight: "700" }}>
