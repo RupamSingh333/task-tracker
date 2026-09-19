@@ -1,12 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { FiType, FiCopy, FiTrash2, FiScissors, FiMail, FiLink, FiVolume2, FiEdit3 } from "react-icons/fi";
+import { 
+  FiType, FiCopy, FiTrash2, FiScissors, FiMail, FiLink, FiVolume2, FiEdit3, 
+  FiRefreshCcw, FiCode, FiAlignLeft, FiFileText, FiGlobe, FiHash, 
+  FiMinimize2, FiMaximize2 
+} from "react-icons/fi";
 
 export default function TextForm(props) {
   const [text, setText] = useState("");
   const isDark = props.mode === "dark";
+  const [voices, setVoices] = useState([]);
+
+  useEffect(() => {
+    const loadVoices = () => {
+      setVoices(window.speechSynthesis.getVoices());
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }, []);
 
   const notify = (message) => toast.success(message);
+  const notifyError = (message) => toast.error(message);
 
   const handleUpclick = () => {
     setText(text.toUpperCase());
@@ -33,10 +47,82 @@ export default function TextForm(props) {
     notify("Extra Spaces Removed");
   };
 
+  const handleRemoveNewlines = () => {
+    setText(text.replace(/\n+/g, ' '));
+    notify("Newlines Removed");
+  };
+
   const handleTitleCase = () => {
     let newText = text.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     setText(newText);
     notify("Converted to Title Case");
+  };
+
+  const handleReverseText = () => {
+    setText(text.split('').reverse().join(''));
+    notify("Text Reversed");
+  };
+
+  const handleBase64Encode = () => {
+    try {
+      setText(btoa(text));
+      notify("Encoded to Base64");
+    } catch (e) {
+      notifyError("Cannot encode to Base64");
+    }
+  };
+
+  const handleBase64Decode = () => {
+    try {
+      setText(atob(text));
+      notify("Decoded from Base64");
+    } catch (e) {
+      notifyError("Invalid Base64 string");
+    }
+  };
+
+  const handleFormatJSON = () => {
+    try {
+      const parsed = JSON.parse(text);
+      setText(JSON.stringify(parsed, null, 2));
+      notify("JSON Formatted");
+    } catch (e) {
+      notifyError("Invalid JSON string");
+    }
+  };
+
+  const handleMinifyJSON = () => {
+    try {
+      const parsed = JSON.parse(text);
+      setText(JSON.stringify(parsed));
+      notify("JSON Minified");
+    } catch (e) {
+      notifyError("Invalid JSON string");
+    }
+  };
+
+  const handleURLEncode = () => {
+    try {
+      setText(encodeURIComponent(text));
+      notify("URL Encoded");
+    } catch (e) {
+      notifyError("Cannot encode URL");
+    }
+  };
+
+  const handleURLDecode = () => {
+    try {
+      setText(decodeURIComponent(text));
+      notify("URL Decoded");
+    } catch (e) {
+      notifyError("Invalid URL string");
+    }
+  };
+
+  const handleRemoveHTML = () => {
+    const doc = new DOMParser().parseFromString(text, 'text/html');
+    setText(doc.body.textContent || "");
+    notify("HTML Tags Removed");
   };
 
   const extractEmails = () => {
@@ -65,9 +151,22 @@ export default function TextForm(props) {
 
   const speakText = () => {
     if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Try to find an Indian Female voice
+      const indianFemale = voices.find(v => 
+        (v.lang === 'en-IN' || v.lang === 'hi-IN') && 
+        (v.name.toLowerCase().includes('female') || v.name.includes('Heera'))
+      ) || voices.find(v => v.lang === 'en-IN' || v.lang === 'hi-IN') 
+        || voices.find(v => v.name.toLowerCase().includes('female'));
+
+      if (indianFemale) {
+        utterance.voice = indianFemale;
+      }
+      
       window.speechSynthesis.speak(utterance);
-      notify("Speaking...");
+      notify("Speaking (Indian Female Voice)...");
     } else {
       toast.error("Sorry, your browser doesn't support text to speech.");
     }
@@ -106,7 +205,33 @@ export default function TextForm(props) {
         ></textarea>
       </div>
 
+      <div className="mb-3 d-flex flex-wrap gap-2">
+        <h5 className="w-100 mb-2" style={{color: isDark ? "#94a3b8" : "#64748b", fontSize: "0.9rem", fontWeight: "600"}}>Developer Tools</h5>
+        <button className="modern-btn modern-btn-primary btn-sm" onClick={handleFormatJSON}>
+          <FiMaximize2 /> Format JSON
+        </button>
+        <button className="modern-btn modern-btn-primary btn-sm" onClick={handleMinifyJSON}>
+          <FiMinimize2 /> Minify JSON
+        </button>
+        <button className="modern-btn modern-btn-secondary btn-sm" onClick={handleBase64Encode}>
+          <FiCode /> Encode Base64
+        </button>
+        <button className="modern-btn modern-btn-secondary btn-sm" onClick={handleBase64Decode}>
+          <FiCode /> Decode Base64
+        </button>
+        <button className="modern-btn modern-btn-secondary btn-sm" onClick={handleURLEncode}>
+          <FiGlobe /> URL Encode
+        </button>
+        <button className="modern-btn modern-btn-secondary btn-sm" onClick={handleURLDecode}>
+          <FiGlobe /> URL Decode
+        </button>
+        <button className="modern-btn modern-btn-secondary btn-sm" onClick={handleRemoveHTML}>
+          <FiHash /> Remove HTML
+        </button>
+      </div>
+
       <div className="d-flex flex-wrap gap-2 mb-5">
+        <h5 className="w-100 mb-2" style={{color: isDark ? "#94a3b8" : "#64748b", fontSize: "0.9rem", fontWeight: "600"}}>Standard Tools</h5>
         <button className="modern-btn modern-btn-primary btn-sm" onClick={handleUpclick}>
           UPPERCASE
         </button>
@@ -116,8 +241,14 @@ export default function TextForm(props) {
         <button className="modern-btn modern-btn-primary btn-sm" onClick={handleTitleCase}>
           <FiEdit3 /> Title Case
         </button>
+        <button className="modern-btn modern-btn-primary btn-sm" onClick={handleReverseText}>
+          <FiRefreshCcw /> Reverse
+        </button>
         <button className="modern-btn modern-btn-secondary btn-sm" onClick={handleExtraSpace}>
           <FiScissors /> Remove Spaces
+        </button>
+        <button className="modern-btn modern-btn-secondary btn-sm" onClick={handleRemoveNewlines}>
+          <FiAlignLeft /> Remove Newlines
         </button>
         <button className="modern-btn modern-btn-secondary btn-sm" onClick={extractEmails}>
           <FiMail /> Extract Emails
@@ -126,7 +257,7 @@ export default function TextForm(props) {
           <FiLink /> Extract Links
         </button>
         <button className="modern-btn modern-btn-secondary btn-sm" onClick={speakText}>
-          <FiVolume2 /> Speak
+          <FiVolume2 /> Speak (India)
         </button>
         <button className="modern-btn modern-btn-secondary btn-sm" onClick={handleCopy}>
           <FiCopy /> Copy
@@ -206,3 +337,4 @@ export default function TextForm(props) {
     </div>
   );
 }
+
