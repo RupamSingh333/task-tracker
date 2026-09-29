@@ -190,7 +190,7 @@ export default function TaskTimer({ mode }) {
                     <span style={{ 
                       fontSize: "1.25rem", 
                       fontWeight: "700", 
-                      color: isRunning ? "var(--accent-light)" : (mode === "dark" ? "#f8fafc" : "#0f172a"),
+                      color: isRunning ? (mode === "dark" ? "var(--accent-dark)" : "var(--accent-light)") : (mode === "dark" ? "#f8fafc" : "#0f172a"),
                       fontFamily: "monospace"
                     }}>
                       {formatTime(timeSpent[task.taskId])}
