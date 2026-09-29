@@ -185,9 +185,19 @@ body[data-theme='dark'] .modern-btn-secondary {
   color: white;
 }
 
+body[data-theme='dark'] .modern-btn-success {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  color: #052e22;
+  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.28);
+}
+
 .modern-btn-success:hover {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
   transform: scale(1.02);
+}
+
+body[data-theme='dark'] .modern-btn-success:hover {
+  background: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
 }
 
 .modern-btn-warning {
